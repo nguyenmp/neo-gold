@@ -1,6 +1,18 @@
+# Compiled files #
 *.class
 
 # Package Files #
 *.jar
 *.war
 *.ear
+
+# Compiled files and javadocs #
+war/WEB-INF/classes/
+
+# Emacs backup files #
+*~
+
+# Project files #
+.settings/
+.classpath
+.project
