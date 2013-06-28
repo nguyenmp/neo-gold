@@ -16,26 +16,24 @@
   </head>
 
   <body>
-  	<form action="login" method="post">
-  		<label for="username">Username</label>
-  		<input type="text" name="username" />
-  		<br />
-  		
-  		<label for="password">Password</label>
-  		<input type="password" name="password" />
-  		<br />
-  		
-  		<input type="submit" value="Submit" />
+  	<form action="courses.jsp" method="get">
+  		<input type="text" name="value" />
+  		<input type="submit" value="Search" />
   	</form>
   	
+  	<h3>results</h3>
+  	
   	<ul>
-  		<%
-  		List<Entity> users = (List<Entity>) request.getAttribute("users");
-  		for (Entity user : users) { %>
-  		
-  		<li><% out.print("" + user.getProperty("username") + user.getProperty("created")); %> </li>
-  		
-  		<% } %>
+  		<li>
+  			<h4><a href="course?id=1234">CLASS 40  - GREEK MYTHOLOGY</a></h4>
+  			<form action="course" method="post">
+  				<input type="hidden" name="action" value="add" />
+  				<input type="submit" value="Add"/>
+  			</form>
+  		</li>
+  		<li>
+  			<h4><a href="course?id=12sd224">CLASS 40H  - GREEK MYTH-HONORS</a></h4>
+  		</li>
   	<ul>
   </body>
 </html>
