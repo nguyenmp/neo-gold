@@ -1,6 +1,13 @@
 package com.nguyenmp.neogold;
 
-public class Department {
+/**
+ * A Java Bean that encapsulates the Departmental data we use to show to clients.
+ * This includes the name of the department ("Anthropology"), the ID of the 
+ * department ("ANTH"), and the alternative query terms ("Study Of Humans").
+ * @author Mark Nguyen
+ * @see DepartmentDAO
+ */
+public class Department implements Comparable<Department> {
 	// Bean Fields
 	private String name = null;
 	private String id = null;
@@ -51,5 +58,17 @@ public class Department {
 		int altHash = alternatives == null ? 0 : alternatives.hashCode();
 		
 		return nameHash + idHash + altHash;
+	}
+	
+	// Implements Comparable<Department>
+	/**
+	 * Compares using the lexographic ordering of the Department's ID 
+	 * while ignoring case sensitvity.
+	 * @see java.lang.String.compareToIgnoreCase(String str)
+	 */
+	@Override
+	public int compareTo(Department o) {
+		// Compare the ID's using the String.compareToIgnoreCase(String) method
+		return this.id.compareToIgnoreCase(o.id);
 	}
 }

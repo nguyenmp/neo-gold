@@ -13,28 +13,125 @@ import org.datanucleus.util.Base64;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PropertyProjection;
+import com.google.appengine.api.datastore.Query;
 
+/**
+ * The Data Access Object for the User bean providing an abstraction 
+ * layer between the database and the business logic.
+ * @author Mark Nguyen
+ * @see User
+ */
 public class UserDAO {
 	private static final Random RANDOM = new Random(System.currentTimeMillis());
 	private static final char[] PASSWORD = null;
+	private static final String ENTITY_KIND = "User";
+	private static final String PROPERTY_ENCRYPTED_USERNAME = "username", 
+			PROPERTY_ENCRYPTED_PASSWORD = "encryptedPassword",
+			PROPERTY_CREATED_UTC = "createdUTC",
+			PROPERTY_ACCESSED_UTC = "accessedUTC";
 	
 	/**
-	 * Puts the username and password into the DB and returns the seed used to encrypt the password
-	 * @param username the username to store into the DB
-	 * @param password the password to store into the DB
-	 * @return the key used to encrypt the password for secure storage
+	 * Puts the username and password into the DB in an encrypted using PBE with MD5 and DES form using a randomly generated salt.  
+	 * The salt is returned in a Java Bean and is required to decrypt the username and password stored 
+	 * in the database. The UserKey also encapsulates the ID of the entity in the database allowing one 
+	 * to look up the specific user's credentials and decrypting it.  This is all handled behind the scenes.
+	 * @param username the username to encrypt and store into the DB
+	 * @param password the password to encrypt and store into the DB
+	 * @return a Java Bean encapsulating the salt and unique ID
+	 * @see UserKey
+	 * @see #get(UserKey)
 	 */
-	public String put(String username, String password) {
+	public static UserKey put(String username, String password) {
+		// Encrypt the username and password with a randomly generated salt
 		byte[] salt = generateSalt(64);
+		String encryptedUsername = transform(username, true, salt);
+		String encryptedPassword = transform(password, true, salt);
 		
+		// Create the Database Entity with the encrypted data
+		Entity entity = new Entity(ENTITY_KIND);
+		entity.setProperty(PROPERTY_ENCRYPTED_USERNAME, encryptedUsername);
+		entity.setProperty(PROPERTY_ENCRYPTED_PASSWORD, encryptedPassword);
+		long currentTime = System.currentTimeMillis();
+		entity.setProperty(PROPERTY_CREATED_UTC, currentTime);
+		entity.setProperty(PROPERTY_ACCESSED_UTC, currentTime);
+		
+		// Store the entity into the database and get the key
 		DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
-		Entity entity = new Entity("User");
-		entity.setProperty("username", username);
-		entity.setProperty("password", password);
-		entity.setProperty("created", System.currentTimeMillis());
 		Key key = datastoreService.put(entity);
-		return new String(salt);
+		long id = key.getId();
+		
+		// Return the generated UserKey bean used for lookups
+		return new UserKey(id, salt);
+	}
+	
+	/**
+	 * Updates when this element was last accessed to the current time.
+	 * @param userKey The key corresponding to the user to update
+	 * @throws EntityNotFoundException if the specified user could not be found
+	 */
+	public static void updateAccess(UserKey userKey) throws EntityNotFoundException {
+		// Get entity from DB using the key provided
+		DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
+		Key key = KeyFactory.createKey(ENTITY_KIND, userKey.getId());
+		Entity entity = datastoreService.get(key);
+		
+		// Update the data
+		entity.setProperty(PROPERTY_ACCESSED_UTC, System.currentTimeMillis());
+		
+		// Put the updated entity into the database
+		datastoreService.put(entity);
+	}
+	
+	/**
+	 * Retrieves the credentials and details of a specific user from the {@link UserKey}.  Behind 
+	 * the scenes, this method decrypts the username and password using the given salt in the reverse 
+	 * manner as it was encrypted in the {@link #put(String, String)} method.
+	 * @param userKey the Java Bean encapsulating the {@link Entity}'s unique ID and encryption salt.
+	 * @return a {@link User} bean that represents the properties of the user specified by the {@link UserKey}
+	 * @throws EntityNotFoundException the User specified no longer exists in our DB.
+	 * This indicates that the credentials have expired or have never existed in the 
+	 * first place.
+	 */
+	public static User get(UserKey userKey) throws EntityNotFoundException {
+		// Extract values from UserKey bean
+		byte[] salt = userKey.getSalt();
+		long id = userKey.getId();
+		
+		// Build query
+		Query query = new Query(ENTITY_KIND);
+		query.addProjection(new PropertyProjection(PROPERTY_ENCRYPTED_USERNAME, String.class));
+		query.addProjection(new PropertyProjection(PROPERTY_ENCRYPTED_PASSWORD, String.class));
+		query.addProjection(new PropertyProjection(PROPERTY_CREATED_UTC, Long.class));
+		Key key = KeyFactory.createKey(ENTITY_KIND, id);
+		
+		// Execute query and retrieve result
+		DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
+		Entity entity = datastoreService.get(key);
+		
+		// Build and initialize User bean with entity data
+		User user = new User();
+		
+		// Set the username
+		String encryptedUsername = (String) entity.getProperty(PROPERTY_ENCRYPTED_USERNAME);
+		String rawUsername = transform(encryptedUsername, false, salt);
+		user.setUcsbNetId(rawUsername);
+		
+		// Set the password
+		String encryptedPassword = (String) entity.getProperty(PROPERTY_ENCRYPTED_PASSWORD);
+		String rawPassword = transform(encryptedPassword, false, salt);
+		user.setPassword(rawPassword);
+		
+		// Set the creation time
+		Long createdUTC = (Long) entity.getProperty(PROPERTY_CREATED_UTC);
+		user.setCreatedUTC(createdUTC);
+		Long accessedUTC = (Long) entity.getProperty(PROPERTY_ACCESSED_UTC);
+		user.setAccessedUTC(accessedUTC);
+		
+		return user;
 	}
 	
 	/**
@@ -79,6 +176,4 @@ public class UserDAO {
 	private static void generateSalt(byte[] array) {
 		RANDOM.nextBytes(array);
 	}
-	
-	
 }

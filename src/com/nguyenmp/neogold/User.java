@@ -1,9 +1,15 @@
 package com.nguyenmp.neogold;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
+	private static final long serialVersionUID = 6282013L;
+	
 	// Bean fields
 	private String ucsbNetID = null;
 	private String password = null;
+	private long createdUTC = 0L;
+	private long accessedUTC = 0L;
 	
 	// Getters
 	/**
@@ -18,6 +24,14 @@ public class User {
 	 */
 	public String getPassword() {
 		return this.password;
+}
+	
+	public long getCreatedUTC() {
+		return createdUTC;
+	}
+	
+	public long getAccessedUTC() {
+		return accessedUTC;
 	}
 	
 	// Setters
@@ -38,6 +52,14 @@ public class User {
 		this.password = password;
 	}
 	
+	public void setCreatedUTC(long createdUTC) {
+		this.createdUTC = createdUTC;
+	}
+	
+	public void setAccessedUTC(long accessedUTC) {
+		this.accessedUTC = accessedUTC;
+	}
+	
 	// Important Object methods
 	
 	@Override
@@ -46,20 +68,5 @@ public class User {
 		int passHash = password == null ? 0 : password.hashCode();
 		
 		return idHash + passHash;
-	}
-	
-	@Override
-	public boolean equals(Object object) {
-		// If the object is of type User, compare the fields
-		if (object instanceof User) {
-			User user = (User) object;
-			return user.ucsbNetID == this.ucsbNetID && 
-					user.password == this.password;
-		}
-		
-		// Otherwise, compare using the supertype... probably Object
-		else {
-			return super.equals(object);
-		}
 	}
 }
