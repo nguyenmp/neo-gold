@@ -1,5 +1,7 @@
 package com.nguyenmp.neogold.beans;
 
+import java.io.Serializable;
+
 
 /**
  * A representative Java Bean that encapsulates the abstract Lecture.  A lecture is an 
@@ -10,7 +12,9 @@ package com.nguyenmp.neogold.beans;
  * Each Lecture has a unique enrollment code (enrlCd) which can be used to identify 
  * one from another.
  */
-public class Lecture {
+public class Lecture implements Serializable, Comparable<Lecture> {
+	private static final long serialVersionUID = 70320132021L;
+
 	/** An integer identifier that is unique for each 
 	 * Lecture and Section on a quarterly basis. */
 	private String enrlCd;
@@ -44,6 +48,8 @@ public class Lecture {
 	 * An array list of Sections that belong under this lecture
 	 */
 	private Section[] sections;
+	
+	private Quarter quarter;
 	
 	// Getters
 	/**
@@ -86,6 +92,10 @@ public class Lecture {
 		return this.sections;
 	}
 	
+	public Quarter getQuarter() {
+		return this.quarter;
+	}
+	
 	// Setters
 	public void setEnrollmentCode(String enrollmentCode) {
 		this.enrlCd = enrollmentCode;
@@ -119,8 +129,38 @@ public class Lecture {
 		this.sections = sections;
 	}
 	
+	public void setQuarter(Quarter quarter) {
+		this.quarter = quarter;
+	}
+	
+	// Important Object methods to override
+	
 	@Override
 	public String toString() {
 		return String.format("%s	%s	%s	%s	%s	%s	%s", enrlCd, days, times, instructors, locations, max, space);
+	}
+	
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof Lecture) {
+			Lecture lecture = (Lecture) object;
+			return lecture.enrlCd.equals(this.enrlCd) && lecture.quarter.equals(this.quarter);
+		} else {
+			return super.equals(object);
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.enrlCd.hashCode() + this.quarter.hashCode();
+	}
+	
+	// Implements Comparable<Lecture>
+	
+	@Override
+	public int compareTo(Lecture o) {
+		int compareResult = this.quarter.compareTo(o.quarter);
+		if (compareResult == 0) this.enrlCd.compareTo(o.enrlCd);
+		return compareResult;
 	}
 }

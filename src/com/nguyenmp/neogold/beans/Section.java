@@ -1,7 +1,9 @@
 package com.nguyenmp.neogold.beans;
 
-class Section {
-	
+import java.io.Serializable;
+
+class Section implements Serializable, Comparable<Section> {
+	private static final long serialVersionUID = 70320132032L;
 	private String enrlCd;
 	private String days;
 	private String times;
@@ -98,6 +100,7 @@ class Section {
 
 	/**
 	 * @param lecture the lecture to set
+	 * @see #getLecture()
 	 */
 	public void setLecture(String lecture) {
 		this.lecture = lecture;
@@ -106,5 +109,27 @@ class Section {
 	@Override
 	public String toString() {
 		return String.format("%s	%s	%s	%s	%s	%s	%s", enrlCd, days, times, instructors, locations, max, space);
+	}
+	
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof Section) {
+			Section section = (Section) object;
+			return quarter.equals(section.quarter) && enrlCd.equals(section.enrlCd);
+		}
+		
+		else {
+			return super.equals(object);
+		}
+	}
+	
+	/**
+	 * Compares by quarter then enrollment code.
+	 */
+	@Override
+	public int compareTo(Section other) {
+		int compareResult = quarter.compareTo(other.quarter);
+		if (compareResult == 0) compareResult = enrlCd.compareTo(other.enrlCd);
+		return compareResult;
 	}
 }
