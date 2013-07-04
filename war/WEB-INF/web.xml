@@ -6,41 +6,59 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 
 	<!-- Servlets and mappings -->
+	
+	<!-- Login Servlet -->
 	<servlet>
 		<servlet-name>Login</servlet-name>
 		<servlet-class>com.nguyenmp.neogold.LoginServlet</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>Courses</servlet-name>
-		<servlet-class>com.nguyenmp.neogold.CoursesServlet</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>Course</servlet-name>
-		<servlet-class>com.nguyenmp.neogold.CourseServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>Login</servlet-name>
 		<url-pattern>/login</url-pattern>
 	</servlet-mapping>
+	
+	<!-- Logout Servlet -->
+	<servlet>
+		<servlet-name>Logout</servlet-name>
+		<servlet-class>com.nguyenmp.neogold.LogoutServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Logout</servlet-name>
+		<url-pattern>/logout</url-pattern>
+	</servlet-mapping>
+	
+	<!-- Courses Servlet -->
+	<servlet>
+		<servlet-name>Courses</servlet-name>
+		<servlet-class>com.nguyenmp.neogold.CoursesServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>Courses</servlet-name>
 		<url-pattern>/courses</url-pattern>
 	</servlet-mapping>
+	
+	<!-- Course Servlet -->
+	<servlet>
+		<servlet-name>Course</servlet-name>
+		<servlet-class>com.nguyenmp.neogold.CourseServlet</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>Course</servlet-name>
 		<url-pattern>/course</url-pattern>
 	</servlet-mapping>
+	
+	<!-- Welcome File -->
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
 	
 	<!-- Filters and mappings -->
 	<filter>
-		<filter-name>LoginFilterServlet</filter-name>
-		<filter-class>com.nguyenmp.neogold.LoginFilterServlet</filter-class>
+		<filter-name>LoginFilter</filter-name>
+		<filter-class>com.nguyenmp.neogold.LoginFilter</filter-class>
 	</filter>
 	<filter-mapping>
-		<filter-name>LoginFilterServlet</filter-name>
+		<filter-name>LoginFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 </web-app>

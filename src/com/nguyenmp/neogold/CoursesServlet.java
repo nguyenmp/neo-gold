@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.nguyenmp.neogold.beans.Department;
+import com.nguyenmp.neogold.beans.Quarter;
 
 @SuppressWarnings("serial")
 public class CoursesServlet extends HttpServlet {

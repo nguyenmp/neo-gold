@@ -8,7 +8,6 @@
 <%@ taglib prefix="c" 
            uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="java.util.*" %>
-<%@ page import="com.google.appengine.api.datastore.Entity" %>
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -16,6 +15,7 @@
   </head>
 
   <body>
+  	<div id="error-type">${errorMessage}</div>
   	<form action="login" method="post">
   		<label for="username">Username</label>
   		<input type="text" name="username" />
@@ -29,13 +29,6 @@
   	</form>
   	
   	<ul>
-  		<%
-  		List<Entity> users = (List<Entity>) request.getAttribute("users");
-  		for (Entity user : users) { %>
-  		
-  		<li><% out.print("" + user.getProperty("username") + user.getProperty("created")); %> </li>
-  		
-  		<% } %>
   	<ul>
   </body>
 </html>

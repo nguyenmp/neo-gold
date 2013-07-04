@@ -59,7 +59,7 @@
   </head>
 
   <body>
-    <form action="courses.jsp" method="get">
+    <form action="courses" method="get">
       <select id="department-selector" name="department" autofocus="autofocus" autocorrect="off" autocomplete="off">
         <option value="" selected="selected">Select Department</option>
         <c:forEach var="department" items="${departments}">
